@@ -6,6 +6,10 @@
 
 1. Having an engine that return a solver includes multiple steps of pouring water from 1 glass to another. 
 
+![alt text](image.png)
+
+Here is a sample plan for the configuration above
+
 2. Allow the user to CRUD the new game as well as its solver for the user to retrieve the history later. 
 
 ### Frontend 

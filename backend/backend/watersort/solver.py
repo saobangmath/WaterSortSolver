@@ -1,5 +1,6 @@
 from collections import defaultdict 
-from queue import Queue
+from queue import LifoQueue
+import time
 
 """
     Bottle have:  
@@ -35,21 +36,29 @@ class Bottle:
         self.waters.append(water)
 
     """
+        dry-run to check if we can pour water from current bottle to the other
+    """
+    def can_pour_to(self, to_bottle) -> bool:
+        if self.is_same_water():
+            if self.is_empty() or self.is_full():
+                return False 
+        
+        return to_bottle.can_add_water_on_top(self.waters[-1])
+
+    """
         pour water to to_bottle
         return True if the state of the current bottle changed aft the operation
         else return False 
     """
     def pour_to(self, to_bottle) -> bool: 
-        if len(self.waters) == 0:
-            return False
-
-        changed = False
+        if not self.can_pour_to(to_bottle):
+            return False 
+        
         while len(self.waters) > 0 and to_bottle.can_add_water_on_top(self.waters[-1]):
             to_bottle.add_water_on_top(self.waters[-1])
             assert(self.pop_water_on_top())
-            changed = True 
 
-        return changed
+        return True 
 
     def is_same_water(self) -> bool:
         for i in range(len(self.waters)):
@@ -60,6 +69,9 @@ class Bottle:
     
     def is_full(self) -> bool:  
         return len(self.waters) == self.capacity  
+
+    def is_empty(self) -> bool: 
+        return len(self.waters) == 0  
 
 """
     represent the state of the game  
@@ -101,36 +113,49 @@ class GameState():
 
     def solve(self):
         back_dict = defaultdict(lambda: None) 
+        dead_nodes = defaultdict(lambda: None)
         initialState = self 
         back_dict[initialState] = [initialState, (0,0)]
-        queue = Queue()
+        queue = LifoQueue()
         queue.put(initialState)
         last_state = None 
         while not queue.empty():
             cur_state: GameState = queue.get()
+            print(cur_state,"\n")
             if cur_state.is_end_state():
                 last_state = cur_state
                 break 
-
+            
             len_bottle = len(cur_state.bottles)
+            can_move: bool = False
             for from_id in range(len_bottle):
                 for to_id in range(len_bottle):
                     if from_id == to_id:
-                        continue 
+                        continue
+                    
+                    if not cur_state.bottles[from_id].can_pour_to(cur_state.bottles[to_id]):
+                        continue
 
                     next_state: GameState = cur_state.clone()
                     if next_state.bottles[from_id].pour_to(next_state.bottles[to_id]):
-                        if back_dict[next_state.__repr__()] != None:
+                        if back_dict[next_state] != None:
                             continue 
                         
-                        back_dict[next_state.__repr__()] = [cur_state, (from_id, to_id)]
+                        if dead_nodes[next_state]:
+                            continue 
+
+                        back_dict[next_state] = [cur_state, (from_id, to_id)]
                         queue.put(next_state)
-                        print(f"\n{from_id}->{to_id}", next_state, "\n", cur_state, "\n")
+                        can_move = True
+            
+            if not can_move: 
+                dead_nodes[cur_state] = True 
+                del(dead_nodes[cur_state])
 
         steps = []
         print("done")
         while True: 
-            back = back_dict[last_state.__repr__()]
+            back = back_dict[last_state]
             prev_state, step = back[0], back[1]
             if prev_state == last_state:
                 break 
@@ -138,7 +163,7 @@ class GameState():
             last_state = prev_state
             steps.append(step)
         
-        return steps[:-1] 
+        return steps[::-1]
         
 
 if __name__ ==  "__main__":
@@ -157,4 +182,16 @@ if __name__ ==  "__main__":
     game.add_bottle(Bottle(4, ["Yellow", "Green2", "Purple", "Pink"]))
     game.add_bottle(Bottle(4, []))
     game.add_bottle(Bottle(4, []))
+    # game.add_bottle(Bottle(4, ["Brown", "Brown", "Yellow", "Pink"]))
+    # game.add_bottle(Bottle(4, ["Red", "Purple", "Red", "Green1"]))
+    # game.add_bottle(Bottle(4, ["Pink", "Purple", "Blue", "Orange"]))
+    # game.add_bottle(Bottle(4, ["Purple", "Green", "Orange", "Brown"]))
+    # game.add_bottle(Bottle(4, ["Green1", "Brown", "Blue", "Yellow"]))
+    # game.add_bottle(Bottle(4, ["Green1", "Green1", "Green", "Blue"]))
+    # game.add_bottle(Bottle(4, ["Red", "Pink", "Pink", "Green"]))
+    # game.add_bottle(Bottle(4, ["Orange", "Green", "Blue", "Orange"]))
+    # game.add_bottle(Bottle(4, ["Gray", "Yellow", "Gray", "Yellow"]))
+    # game.add_bottle(Bottle(4, ["Gray", "Red", "Gray", "Purple"]))
+    # game.add_bottle(Bottle(4, []))
+    # game.add_bottle(Bottle(4, []))
     print(game.solve())

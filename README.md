@@ -10,6 +10,8 @@
 
 Here is a sample plan for the configuration above
 
+![alt text](image-1.png)
+
 2. Allow the user to CRUD the new game as well as its solver for the user to retrieve the history later. 
 
 ### Frontend 

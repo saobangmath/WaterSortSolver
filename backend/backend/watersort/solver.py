@@ -1,6 +1,5 @@
 from collections import defaultdict 
 from queue import LifoQueue
-import time
 
 """
     Bottle have:  
@@ -40,10 +39,21 @@ class Bottle:
     """
     def can_pour_to(self, to_bottle) -> bool:
         if self.is_same_water():
+            if to_bottle.is_empty():
+                return False 
+            
             if self.is_empty() or self.is_full():
                 return False 
         
-        return to_bottle.can_add_water_on_top(self.waters[-1])
+        if not to_bottle.can_add_water_on_top(self.waters[-1]):
+            return False 
+        
+        c = 0
+        for water in self.waters[::-1]:
+            if water == self.waters[-1]:
+                c += 1
+
+        return c + len(to_bottle.waters) <= to_bottle.capacity 
 
     """
         pour water to to_bottle
@@ -121,7 +131,6 @@ class GameState():
         last_state = None 
         while not queue.empty():
             cur_state: GameState = queue.get()
-            print(cur_state,"\n")
             if cur_state.is_end_state():
                 last_state = cur_state
                 break 
@@ -144,7 +153,7 @@ class GameState():
                         if dead_nodes[next_state]:
                             continue 
 
-                        back_dict[next_state] = [cur_state, (from_id, to_id)]
+                        back_dict[next_state] = [cur_state, (from_id + 1, to_id + 1)]
                         queue.put(next_state)
                         can_move = True
             
@@ -153,7 +162,6 @@ class GameState():
                 del(dead_nodes[cur_state])
 
         steps = []
-        print("done")
         while True: 
             back = back_dict[last_state]
             prev_state, step = back[0], back[1]
@@ -168,18 +176,18 @@ class GameState():
 
 if __name__ ==  "__main__":
     game = GameState()
-    game.add_bottle(Bottle(4, ["Yellow", "Blue1", "Green1", "Green1"]))
-    game.add_bottle(Bottle(4, ["Green2", "Brown", "Blue2", "Red"]))
-    game.add_bottle(Bottle(4, ["Brown", "Blue2", "Red", "Green3"]))
-    game.add_bottle(Bottle(4, ["Pink", "Yellow", "Yellow", "Orange"]))
-    game.add_bottle(Bottle(4, ["Blue1", "Green1", "Red", "Brown"]))
-    game.add_bottle(Bottle(4, ["Orange", "Green1", "Green3", "Green3"]))
-    game.add_bottle(Bottle(4, ["Gray", "Blue2", "Green2", "Blue1"]))
-    game.add_bottle(Bottle(4, ["Gray", "Brown", "Orange", "Gray"]))
-    game.add_bottle(Bottle(4, ["Gray", "Blue2", "Green3", "Pink"]))
-    game.add_bottle(Bottle(4, ["Green2", "Red", "Purple", "Purple"]))
-    game.add_bottle(Bottle(4, ["Pink", "Orange", "Purple", "Blue1"]))
-    game.add_bottle(Bottle(4, ["Yellow", "Green2", "Purple", "Pink"]))
+    game.add_bottle(Bottle(4, ["XanhBlue", "Hong", "Tim", "Nau"]))
+    game.add_bottle(Bottle(4, ["Tim", "Vang", "Xam", "XanhBlue"]))
+    game.add_bottle(Bottle(4, ["XanhCyan", "Xam", "XanhNon", "XanhDam"]))
+    game.add_bottle(Bottle(4, ["Do", "Vang", "Cam", "XanhLuc"]))
+    game.add_bottle(Bottle(4, ["XanhBlue", "Nau", "Xam", "XanhDam"]))
+    game.add_bottle(Bottle(4, ["XanhDam", "XanhCyan", "Hong", "Nau"]))
+    game.add_bottle(Bottle(4, ["Nau", "Tim", "XanhLuc", "Hong"]))
+    game.add_bottle(Bottle(4, ["XanhCyan", "XanhNon", "Cam", "XanhNon"]))
+    game.add_bottle(Bottle(4, ["Vang", "Do", "XanhLuc", "XanhCyan"]))
+    game.add_bottle(Bottle(4, ["XanhBlue", "Cam", "Do", "Hong"]))
+    game.add_bottle(Bottle(4, ["Do", "XanhLuc", "Xam", "XanhDam"]))
+    game.add_bottle(Bottle(4, ["Vang", "XanhNon", "Cam", "Tim"]))
     game.add_bottle(Bottle(4, []))
     game.add_bottle(Bottle(4, []))
     # game.add_bottle(Bottle(4, ["Brown", "Brown", "Yellow", "Pink"]))

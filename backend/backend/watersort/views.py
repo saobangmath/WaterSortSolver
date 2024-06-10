@@ -1,9 +1,11 @@
+from collections.abc import Iterable
 from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, JsonResponse
 from rest_framework import status 
 from rest_framework.decorators import api_view
 from .solver import GameState, Bottle
-import json
+import json, time
+from threading import Thread
 
 # Create your views here.
 
@@ -16,10 +18,21 @@ def generate_solver_plan(request: HttpRequest):
     game : GameState = GameState()
     bottles = data["bottles"]
     if not isinstance(bottles, list):
-        return HttpResponse("invalid data", status = 404)
+        return JsonResponse({"err": "invalid data"}, status = 404)
 
     for bottle in bottles: 
-        game.add_bottle(Bottle(capacity = bottle["capacity"], waters = bottle["waters"]))
-
-    plan  = game.solve()
-    return HttpResponse(plan, status = 200)
+        try:
+            capacity = int(bottle["capacity"])
+            waters = list[str](bottle["waters"])
+            game.add_bottle(Bottle(capacity = capacity, waters = waters))
+        except: 
+            return JsonResponse({"err": "invalid body request"}, status = 404)
+    
+    
+    thread  = Thread(target=game.solve)
+    thread.start()
+    thread.join(timeout=10)
+    if thread.is_alive(): 
+        return JsonResponse({"err": "too much time taken for generating the plan (timeout = 10 seconds)"}, status = 500)
+    
+    return JsonResponse({"plan": game.plan}, status = 200)

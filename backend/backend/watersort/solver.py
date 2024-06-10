@@ -7,7 +7,7 @@ from queue import LifoQueue
     2. waters array store the waters from bottom to top
 """
 class Bottle: 
-    def __init__(self, capacity: int, waters: list): 
+    def __init__(self, capacity: int, waters: list[str]): 
         self.capacity = capacity 
         self.waters = [water for water in waters]
 
@@ -29,7 +29,7 @@ class Bottle:
         if self.is_full():
             return False 
         
-        return len(self.waters) == 0 or self.waters[-1] == water 
+        return self.is_empty() or self.waters[-1] == water 
     
     def add_water_on_top(self, water: str): 
         self.waters.append(water)
@@ -48,12 +48,12 @@ class Bottle:
         if not to_bottle.can_add_water_on_top(self.waters[-1]):
             return False 
         
-        c = 0
+        waterCnt = 0
         for water in self.waters[::-1]:
             if water == self.waters[-1]:
-                c += 1
+                waterCnt += 1
 
-        return c + len(to_bottle.waters) <= to_bottle.capacity 
+        return waterCnt + len(to_bottle.waters) <= to_bottle.capacity 
 
     """
         pour water to to_bottle
@@ -89,6 +89,7 @@ class Bottle:
 class GameState(): 
     def __init__(self) -> None:
         self.bottles = []
+        self.plan = None 
 
     def __repr__(self) -> str:
         st = ""
@@ -119,6 +120,15 @@ class GameState():
         for bottle in self.bottles:
             if not bottle.is_same_water():
                 return False
+        
+        waterSet = set()
+        for bottle in self.bottles: 
+            if not bottle.is_empty() and not bottle.is_full():
+                water = bottle.waters[-1]
+                if water in waterSet: 
+                    return False 
+                waterSet.add(water)
+
         return True 
 
     def solve(self):
@@ -153,7 +163,7 @@ class GameState():
                         if dead_nodes[next_state]:
                             continue 
 
-                        back_dict[next_state] = [cur_state, (from_id + 1, to_id + 1)]
+                        back_dict[next_state] = [cur_state, (from_id, to_id)]
                         queue.put(next_state)
                         can_move = True
             
@@ -171,7 +181,7 @@ class GameState():
             last_state = prev_state
             steps.append(step)
         
-        return steps[::-1]
+        self.plan = steps[::-1]
         
 
 if __name__ ==  "__main__":
@@ -202,4 +212,5 @@ if __name__ ==  "__main__":
     # game.add_bottle(Bottle(4, ["Gray", "Red", "Gray", "Purple"]))
     # game.add_bottle(Bottle(4, []))
     # game.add_bottle(Bottle(4, []))
-    print(game.solve())
+    game.solve()
+    print(game.plan)

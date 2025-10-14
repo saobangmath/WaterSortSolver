@@ -19,7 +19,8 @@ const AVAILABLE_COLORS = [
   { name: 'Nau', color: '#A52A2A', label: 'Brown' },
   { name: 'XanhCyan', color: '#00FFFF', label: 'Cyan' },
   { name: 'Cam', color: '#FFA500', label: 'Orange' },
-  { name: 'Vang', color: '#FFFF00', label: 'Yellow' }
+  { name: 'Vang', color: '#FFFF00', label: 'Yellow' },
+  { name: 'XanhNavy', color: '#000080', label: 'Navy Blue' }
 ];
 
 export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
@@ -59,6 +60,16 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
     const newBottles = [...bottles];
     newBottles[bottleIndex].waters.push(color);
     setBottles(newBottles);
+  };
+
+  const handleColorClick = (color: string) => {
+    if (selectedBottle !== null) {
+      // If a bottle is selected, add the color to that bottle
+      addWater(selectedBottle, color);
+    } else {
+      // If no bottle is selected, just select the color
+      setSelectedColor(color);
+    }
   };
 
   const removeWater = (bottleIndex: number) => {
@@ -220,6 +231,13 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
       return;
     }
 
+    // Save the current state as original before solving
+    const currentState = bottles.map(bottle => ({
+      capacity: bottle.capacity,
+      waters: [...bottle.waters] // Deep copy of waters array
+    }));
+    setOriginalBottles(currentState);
+
     setIsSolving(true);
     setSolveResult(null);
     
@@ -240,7 +258,6 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
       if (response.ok) {
         const data = await response.json();
         setSolution(data.plan || []);
-        setOriginalBottles([...bottles]); // Save original state
         setSolveResult({ 
           success: true, 
           message: `✅ Puzzle solved! Found solution in ${data.steps || data.plan?.length || 0} steps.` 
@@ -263,11 +280,16 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
   };
 
   const playSolution = () => {
-    if (solution.length === 0) return;
+    if (solution.length === 0 || originalBottles.length === 0) return;
     
     setIsPlayingSolution(true);
     setCurrentStep(0);
-    setBottles([...originalBottles]); // Reset to original state
+    // Deep copy the original bottles to ensure proper restoration
+    const restoredBottles = originalBottles.map(bottle => ({
+      capacity: bottle.capacity,
+      waters: [...bottle.waters]
+    }));
+    setBottles(restoredBottles);
   };
 
   const nextStep = () => {
@@ -281,18 +303,45 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
   };
 
   const resetToOriginal = () => {
-    setBottles([...originalBottles]);
+    if (originalBottles.length > 0) {
+      // Deep copy the original bottles to ensure proper restoration
+      const restoredBottles = originalBottles.map(bottle => ({
+        capacity: bottle.capacity,
+        waters: [...bottle.waters]
+      }));
+      setBottles(restoredBottles);
+    }
+    setIsPlayingSolution(false);
+    setIsAutoPlaying(false);
+    setCurrentStep(0);
+  };
+
+  const saveCurrentAsOriginal = () => {
+    // Save the current state as the new original state
+    const currentState = bottles.map(bottle => ({
+      capacity: bottle.capacity,
+      waters: [...bottle.waters] // Deep copy of waters array
+    }));
+    setOriginalBottles(currentState);
+    setSolveResult(null); // Clear any previous solve results
+    setSolution([]); // Clear any previous solution
     setIsPlayingSolution(false);
     setIsAutoPlaying(false);
     setCurrentStep(0);
   };
 
   const executeAllSteps = () => {
-    if (solution.length === 0) return;
+    if (solution.length === 0 || originalBottles.length === 0) return;
     
     setIsAutoPlaying(true);
-    setBottles([...originalBottles]); // Reset to original state
     setCurrentStep(0);
+    
+    // Deep copy the original bottles to ensure proper restoration
+    const restoredBottles = originalBottles.map(bottle => ({
+      capacity: bottle.capacity,
+      waters: [...bottle.waters]
+    }));
+    setBottles(restoredBottles);
     
     // Execute all steps with delay
     solution.forEach((step, index) => {
@@ -445,7 +494,7 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
               {AVAILABLE_COLORS.map((color) => (
                 <button
                   key={color.name}
-                  onClick={() => setSelectedColor(color.name)}
+                  onClick={() => handleColorClick(color.name)}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     selectedColor === color.name
                       ? 'border-blue-500 shadow-md'
@@ -461,12 +510,26 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
               ))}
             </div>
             
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <div className={`mt-4 p-3 rounded-lg ${
+              selectedBottle !== null 
+                ? 'bg-green-50 border border-green-200' 
+                : 'bg-blue-50'
+            }`}>
               <p className="text-sm text-blue-800">
-                <strong>Selected:</strong> {AVAILABLE_COLORS.find(c => c.name === selectedColor)?.label}
+                <strong>Selected Color:</strong> {AVAILABLE_COLORS.find(c => c.name === selectedColor)?.label}
               </p>
-              <p className="text-xs text-blue-600 mt-1">
-                Click on a bottle to add this color
+              {selectedBottle !== null && (
+                <p className="text-sm text-green-800 mt-1">
+                  <strong>Selected Bottle:</strong> Bottle {selectedBottle + 1}
+                </p>
+              )}
+              <p className={`text-xs mt-1 ${
+                selectedBottle !== null ? 'text-green-600' : 'text-blue-600'
+              }`}>
+                {selectedBottle !== null 
+                  ? `Click any color to add it to bottle ${selectedBottle + 1}`
+                  : "Click on a bottle first, then click a color to add it"
+                }
               </p>
             </div>
           </div>
@@ -483,6 +546,12 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
                     className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 transition-colors"
                   >
                     {isSolving ? 'Solving...' : 'Solve Puzzle'}
+                  </button>
+                  <button
+                    onClick={saveCurrentAsOriginal}
+                    className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    Save as Original
                   </button>
                   <button
                     onClick={addBottle}
@@ -614,12 +683,15 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
                 <h3 className="font-semibold text-yellow-800 mb-2">Instructions:</h3>
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li>• Click on a bottle to select it (highlighted in blue)</li>
-                  <li>• Click on a color to select it, then click on a bottle to add that color</li>
+                  <li>• <strong>Method 1:</strong> Click a color, then click a bottle to add that color</li>
+                  <li>• <strong>Method 2:</strong> Click a bottle first, then click any color to add it to that bottle</li>
                   <li>• Use the controls below selected bottles to remove waters or change capacity</li>
                   <li>• Each color should appear exactly 4 times for a solvable puzzle</li>
                   <li>• Leave 2 empty bottles for the solution</li>
+                  <li>• Click "Save as Original" to save current state as the starting point</li>
                   <li>• Click "Solve Puzzle" to test your puzzle with AI</li>
                   <li>• After solving, click "Play Solution" for manual step-by-step or "Execute All Steps" for automatic playback</li>
+                  <li>• Use "Reset" to return to the saved original state</li>
                 </ul>
               </div>
             </div>

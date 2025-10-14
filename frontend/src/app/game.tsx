@@ -25,6 +25,7 @@ const COLOR_MAP: { [key: string]: string } = {
   'XanhCyan': '#00FFFF',
   'Cam': '#FFA500',
   'Vang': '#FFFF00',
+  'XanhNavy': '#000080',
   'Empty': '#F0F0F0'
 };
 

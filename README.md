@@ -1,3 +1,6 @@
+![alt text](images/fe.png)
+
+
 # 🧪 Water Sort Solver
 
 A beautiful, interactive Water Sort puzzle game with AI-powered solving capabilities. Built with Next.js frontend and Django backend.

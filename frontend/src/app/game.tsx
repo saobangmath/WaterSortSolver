@@ -128,7 +128,7 @@ export default function Game({ onBack }: { onBack: () => void }) {
   const solvePuzzle = async () => {
     setIsSolving(true);
     try {
-      const response = await fetch('http://localhost:8000/api/solve/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/solve/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

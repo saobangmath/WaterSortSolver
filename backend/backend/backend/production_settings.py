@@ -31,8 +31,6 @@ else:
 
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-url.vercel.app",
-    "https://your-username.github.io",
     "http://localhost:3000",  # For development
 ]
 
@@ -40,6 +38,10 @@ CORS_ALLOWED_ORIGINS = [
 FRONTEND_URLS = os.environ.get('FRONTEND_URLS', '').split(',')
 if FRONTEND_URLS and FRONTEND_URLS[0]:
     CORS_ALLOWED_ORIGINS.extend(FRONTEND_URLS)
+
+# For Vercel deployment, allow all origins in development
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # Static files
 STATIC_URL = '/static/'

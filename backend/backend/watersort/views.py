@@ -11,6 +11,10 @@ from threading import Thread
 
 # Create your views here.
 
+def home(request):
+    """Home view for the root path"""
+    return HttpResponse("Welcome to Water Sort Solver API! 🧪")
+
 def index(request, index_id): 
     return HttpResponse(f"water sort landing page {index_id}")
 

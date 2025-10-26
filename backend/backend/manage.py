@@ -7,8 +7,9 @@ import sys
 def main():
     """Run administrative tasks."""
     # Use production settings if DJANGO_SETTINGS_MODULE is set to production
-    if os.environ.get('DJANGO_SETTINGS_MODULE') == 'backend.production_settings':
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.production_settings')
+    django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE', '')
+    if django_settings_module:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', django_settings_module)
     else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
     

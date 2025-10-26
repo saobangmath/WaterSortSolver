@@ -20,7 +20,7 @@ from watersort import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path("water-sort/",include("watersort.urls")),
     path("api/",include("watersort.urls"))
 ]   

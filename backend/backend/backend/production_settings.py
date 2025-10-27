@@ -5,8 +5,8 @@ import os
 from .settings import *
 
 # Ensure watersort app is included
-if 'watersort' not in INSTALLED_APPS:
-    INSTALLED_APPS.append('watersort')
+if 'watersort.apps.WatersortConfig' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('watersort.apps.WatersortConfig')
 
 # Security settings
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'

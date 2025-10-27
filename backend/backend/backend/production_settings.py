@@ -4,9 +4,7 @@ Production settings for Water Sort Solver
 import os
 from .settings import *
 
-# Ensure watersort app is included
-if 'watersort.apps.WatersortConfig' not in INSTALLED_APPS:
-    INSTALLED_APPS.append('watersort.apps.WatersortConfig')
+# watersort is used as a module, not a Django app
 
 # Security settings
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'

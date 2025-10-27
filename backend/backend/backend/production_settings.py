@@ -4,6 +4,10 @@ Production settings for Water Sort Solver
 import os
 from .settings import *
 
+# Ensure watersort app is included
+if 'watersort' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('watersort')
+
 # Security settings
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 SECRET_KEY = os.environ.get('SECRET_KEY', SECRET_KEY)

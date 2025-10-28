@@ -18,6 +18,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # For development
+    "*"
 ]
 
 # Add your actual frontend URLs here

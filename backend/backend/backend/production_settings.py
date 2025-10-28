@@ -19,7 +19,7 @@ ALLOWED_HOSTS = ["*"]
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # For development
-    "*"
+    "http://127.0.0.1:3000",  # For development
 ]
 
 # Add your actual frontend URLs here
@@ -27,9 +27,8 @@ FRONTEND_URLS = os.environ.get('FRONTEND_URLS', '').split(',')
 if FRONTEND_URLS and FRONTEND_URLS[0]:
     CORS_ALLOWED_ORIGINS.extend(FRONTEND_URLS)
 
-# For Vercel deployment, allow all origins in development
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
+# For Vercel deployment, allow all origins
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Static files
 STATIC_URL = '/static/'

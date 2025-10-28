@@ -688,10 +688,10 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
                   <li>• Use the controls below selected bottles to remove waters or change capacity</li>
                   <li>• Each color should appear exactly 4 times for a solvable puzzle</li>
                   <li>• Leave 2 empty bottles for the solution</li>
-                  <li>• Click "Save as Original" to save current state as the starting point</li>
-                  <li>• Click "Solve Puzzle" to test your puzzle with AI</li>
-                  <li>• After solving, click "Play Solution" for manual step-by-step or "Execute All Steps" for automatic playback</li>
-                  <li>• Use "Reset" to return to the saved original state</li>
+                  <li>• Click &quot;Save as Original&quot; to save current state as the starting point</li>
+                  <li>• Click &quot;Solve Puzzle&quot; to test your puzzle with AI</li>
+                  <li>• After solving, click &quot;Play Solution&quot; for manual step-by-step or &quot;Execute All Steps&quot; for automatic playback</li>
+                  <li>• Use &quot;Reset&quot; to return to the saved original state</li>
                 </ul>
               </div>
             </div>

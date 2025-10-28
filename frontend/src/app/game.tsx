@@ -403,7 +403,7 @@ export default function Game({ onBack }: { onBack: () => void }) {
             <li>• Click on another bottle to pour water from selected to target</li>
             <li>• You can only pour water of the same color on top of each other</li>
             <li>• Goal: Sort all waters so each bottle contains only one color</li>
-            <li>• Use the "Solve" button to get the optimal solution</li>
+            <li>• Use the &quot;Solve&quot; button to get the optimal solution</li>
           </ul>
         </div>
       </div>

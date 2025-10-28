@@ -13,7 +13,7 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://your-backend-url.vercel.app"
+    "NEXT_PUBLIC_API_URL": "https://your-backend-url.vercel.appp"
   },
   "functions": {
     "src/app/**/*.tsx": {

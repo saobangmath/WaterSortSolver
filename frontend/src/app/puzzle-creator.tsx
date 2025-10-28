@@ -112,7 +112,7 @@ export default function PuzzleCreator({ onBack }: { onBack: () => void }) {
   };
 
   const randomizePuzzle = () => {
-    const newBottles = bottles.map(bottle => ({ ...bottle, waters: [] }));
+    const newBottles: Bottle[] = bottles.map(bottle => ({ ...bottle, waters: [] }));
     
     // Create a solvable puzzle by ensuring each color appears exactly 4 times
     const colorCounts: { [key: string]: number } = {};
